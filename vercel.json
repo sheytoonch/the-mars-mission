@@ -1,26 +1,15 @@
 {
-  "version": 2,
-  "builds": [
+  "projects": [
     {
-      "src": "frontend/package.json",
-      "use": " @vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "name": "mars-frontend",
+      "source": "./frontend",
+      "buildCommand": "npm run build",
+      "outputDirectory": "./build"
     },
     {
-      "src": "backend/backend.index.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/.(*)",
-      "dest": "/backend/backend.index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "name": "mars-backend",
+      "source": "./backend",
+      "buildCommand": "npm start"
     }
   ]
 }
