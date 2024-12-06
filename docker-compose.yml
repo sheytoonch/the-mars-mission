@@ -1,0 +1,25 @@
+version: '3.9'
+
+# docker-compose build --force-rm && docker-compose up
+
+services:
+  mars_mission_backend:
+    build:
+      context: ./backend # folder where the dockerfile is located
+      dockerfile: backend.dockerfile # dockerfile name
+    ports:
+      - "3001:3001"
+    volumes:
+      - exercises:/backend/db # db folder from the exercise will be saved in the volume
+
+  mars_mission_frontend:
+    build:
+      context: ./frontend
+      dockerfile: frontend.dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - mars_mission_backend
+
+volumes:
+  exercises:
