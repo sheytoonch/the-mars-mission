@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import LeftPanel from './components/panels/leftPanel/LeftPanel';
-import MiddlePanel from './components/panels/middlePanel/MiddlePanel';
-import RightPanel from './components/panels/rightPanel/RightPanel';
-import BackgroundCanvas from './components/backgroundCanvas/BackgroundCanvas';
-import Modal from './components/Modal/Modal';
-import './App.css';
-import { Astronaut } from './types';
+import React, { useEffect, useState } from "react";
+import LeftPanel from "./components/panels/leftPanel/LeftPanel";
+import MiddlePanel from "./components/panels/middlePanel/MiddlePanel";
+import RightPanel from "./components/panels/rightPanel/RightPanel";
+import BackgroundCanvas from "./components/backgroundCanvas/BackgroundCanvas";
+import Modal from "./components/Modal/Modal";
+import "./App.css";
+import { Astronaut } from "./types";
 
 function App() {
-  const apiUrl = 'http://localhost:3001/api';
+  const apiUrl = "http://localhost:21020/api";
 
   const [showModal, setShowModal] = useState(true);
   const [astronauts, setAstronauts] = useState<Astronaut[]>([]);
@@ -19,7 +19,9 @@ function App() {
     setAstronauts(data.astronauts);
   }
 
-  const [selectedAstronaut, setSelectedAstronaut] = useState<Astronaut | null>(null);
+  const [selectedAstronaut, setSelectedAstronaut] = useState<Astronaut | null>(
+    null
+  );
   const handleAstronautClick = (astronaut: Astronaut) => {
     setSelectedAstronaut(astronaut);
     setIsAdding(false);
@@ -27,42 +29,48 @@ function App() {
     resetLogMessage();
   };
 
-  const [logMessage, setLogMessage] = useState('Calling Houston...');
+  const [logMessage, setLogMessage] = useState("Calling Houston...");
 
   const handleDelete = async (id: number) => {
     try {
       await fetch(`${apiUrl}/astronauts/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       setAstronauts((prevAstronauts) => {
-        const updatedAstronauts = prevAstronauts.filter((astronaut) => astronaut.id !== id);
-        setLogMessage('Astronaut deleted');
+        const updatedAstronauts = prevAstronauts.filter(
+          (astronaut) => astronaut.id !== id
+        );
+        setLogMessage("Astronaut deleted");
         resetLogMessage();
         return updatedAstronauts;
       });
       setSelectedAstronaut(null);
     } catch (error) {
-      console.error('Error deleting astronaut:', error);
+      console.error("Error deleting astronaut:", error);
     }
   };
 
   const handleUpdate = async (updatedAstronaut: Astronaut) => {
     try {
       const res = await fetch(`${apiUrl}/astronauts/${updatedAstronaut.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(updatedAstronaut),
       });
       if (res.ok) {
-        setAstronauts(astronauts.map((astronaut) => (astronaut.id === updatedAstronaut.id ? updatedAstronaut : astronaut)));
+        setAstronauts(
+          astronauts.map((astronaut) =>
+            astronaut.id === updatedAstronaut.id ? updatedAstronaut : astronaut
+          )
+        );
         setSelectedAstronaut(updatedAstronaut);
-        setLogMessage('Astronaut updated');
+        setLogMessage("Astronaut updated");
         resetLogMessage();
       }
     } catch (error) {
-      console.error('Error updating astronaut:', error);
+      console.error("Error updating astronaut:", error);
     }
   };
 
@@ -70,28 +78,31 @@ function App() {
   const handleAdd = async (newAstronaut: Partial<Astronaut>) => {
     try {
       const res = await fetch(`${apiUrl}/astronauts`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(newAstronaut),
       });
       if (res.ok) {
         const addedAstronaut = await res.json();
         console.log(addedAstronaut);
-        setAstronauts((prevAstronauts) => [...prevAstronauts, addedAstronaut.astronaut]);
+        setAstronauts((prevAstronauts) => [
+          ...prevAstronauts,
+          addedAstronaut.astronaut,
+        ]);
         setSelectedAstronaut(null);
         setIsAdding(false);
         resetLogMessage();
       }
     } catch (error) {
-      console.error('Error adding astronaut:', error);
+      console.error("Error adding astronaut:", error);
     }
   };
 
   const resetLogMessage = () => {
     setTimeout(() => {
-      setLogMessage('Calling Houston...');
+      setLogMessage("Calling Houston...");
     }, 3000);
   };
 
@@ -109,7 +120,8 @@ function App() {
           setAstronauts={setAstronauts}
           onAstronautClick={handleAstronautClick}
           setIsAdding={setIsAdding}
-          setLogMessage={setLogMessage} />
+          setLogMessage={setLogMessage}
+        />
         <MiddlePanel
           selectedAstronaut={selectedAstronaut}
           onDelete={handleDelete}
@@ -117,12 +129,11 @@ function App() {
           onAdd={handleAdd}
           isAdding={isAdding}
           setIsAdding={setIsAdding}
-          setSelectedAstronaut={setSelectedAstronaut} />
-        <RightPanel
-          logMessage={logMessage}
+          setSelectedAstronaut={setSelectedAstronaut}
         />
+        <RightPanel logMessage={logMessage} />
       </div>
-    </div >
+    </div>
   );
 }
 
