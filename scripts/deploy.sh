@@ -55,7 +55,11 @@ cd $BACKEND_DIR
 tar -xzf ../backend-files.tar.gz
 npm start &
 
-# 8. Start the frontend app
+# 8. Install serve
+echo "Installing serve..."
+npm install -g serve
+
+# 9. Start the frontend app
 echo "Starting the frontend app..."
 cd $FRONTEND_DIR
 tar -xzf ../frontend-build.tar.gz
