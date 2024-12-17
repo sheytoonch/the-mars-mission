@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import LeftPanel from "./components/panels/leftPanel/LeftPanel";
 import MiddlePanel from "./components/panels/middlePanel/MiddlePanel";
 import RightPanel from "./components/panels/rightPanel/RightPanel";
@@ -13,20 +13,20 @@ function App() {
   const [showModal, setShowModal] = useState(true);
   const [astronauts, setAstronauts] = useState<Astronaut[]>([]);
 
-  const getAstronauts = async () => {
-    try {
-      const res = await fetch(`${apiUrl}/astronauts`);
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
-      }
-      const data = await res.json();
-      console.log(data);
-      setAstronauts(data.astronauts);
-    } catch (error) {
-      console.error("Error fetching astronauts:", error);
-      setLogMessage("Error fetching astronauts");
-    }
-  };
+  // const getAstronauts = async () => {
+  //   try {
+  //     const res = await fetch(`${apiUrl}/astronauts`);
+  //     if (!res.ok) {
+  //       throw new Error(`HTTP error! status: ${res.status}`);
+  //     }
+  //     const data = await res.json();
+  //     console.log(data);
+  //     setAstronauts(data.astronauts);
+  //   } catch (error) {
+  //     console.error("Error fetching astronauts:", error);
+  //     setLogMessage("Error fetching astronauts");
+  //   }
+  // };
 
   const [selectedAstronaut, setSelectedAstronaut] = useState<Astronaut | null>(
     null
@@ -115,9 +115,22 @@ function App() {
     }, 3000);
   };
 
-  // useEffect(() => {
-  //   getAstronauts();
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(`${apiUrl}/astronauts`);
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        console.log(data);
+        setAstronauts(data.astronauts);
+      } catch (error) {
+        console.error("Error fetching astronauts:", error);
+        setLogMessage("Error fetching astronauts");
+      }
+    })();
+  }, [apiUrl]); // Dependency array includes apiUrl to ensure it runs only once
 
   return (
     <div className="App">
