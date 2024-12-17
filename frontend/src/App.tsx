@@ -8,7 +8,7 @@ import "./App.css";
 import { Astronaut } from "./types";
 
 function App() {
-  const apiUrl = "http://localhost:21020/api";
+  const apiUrl = process.env["BACKEND_URL"] || "http://localhost:21020/api";
 
   const [showModal, setShowModal] = useState(true);
   const [astronauts, setAstronauts] = useState<Astronaut[]>([]);

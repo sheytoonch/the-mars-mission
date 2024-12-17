@@ -4,6 +4,7 @@ import "./LeftPanel.css";
 import "../Panels.css";
 import { Astronaut } from "../../../types";
 
+const apiUrl = process.env["BACKEND_URL"] || "http://localhost:21020/api";
 interface LeftPanelProps {
   astronauts: Astronaut[];
   setAstronauts: React.Dispatch<React.SetStateAction<Astronaut[]>>;
@@ -28,7 +29,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({
   // should it be there or moved to the app.tsx if it is a globally used function?
   const handleDelete = async (id: number) => {
     try {
-      await fetch(`http://localhost:21020/api/astronauts/${id}`, {
+      await fetch(`${apiUrl}/astronauts/${id}`, {
         method: "DELETE",
       });
       setAstronauts(astronauts.filter((astronaut) => astronaut.id !== id));
