@@ -108,7 +108,7 @@ function App() {
 
   useEffect(function () {
     getAstronauts();
-  }, []);
+  }, [getAstronauts]);
 
   return (
     <div className="App">
