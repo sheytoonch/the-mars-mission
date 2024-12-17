@@ -115,9 +115,9 @@ function App() {
     }, 3000);
   };
 
-  useEffect(() => {
-    getAstronauts();
-  }, []);
+  // useEffect(() => {
+  //   getAstronauts();
+  // }, []);
 
   return (
     <div className="App">
