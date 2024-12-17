@@ -109,7 +109,7 @@ jobs:
         run: |
           echo "Copying deploy script to server..."
           sshpass -p "$FROG_PASSWORD" \
-            scp -P "$FROG_PORT" \
+            scp -o StrictHostKeyChecking=no -P "$FROG_PORT" \
             ./scripts/deploy.sh \
             "$FROG_LOGIN@$FROG_URL:/home/frog/the-mars-mission/deploy.sh"
 
