@@ -1,0 +1,155 @@
+name: Build Express Node Backend and React Typescript Frontend apps
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
+  BACKEND_URL: ${{ secrets.BACKEND_URL }}
+  FROG_LOGIN: ${{ secrets.FROG_LOGIN }}
+  FROG_PASSWORD: ${{ secrets.FROG_PASSWORD }}
+  FROG_PORT: ${{ secrets.FROG_PORT }}
+  FROG_URL: ${{ secrets.FROG_URL }}
+  FRONTEND_PORT: ${{ secrets.FRONTEND_PORT }}
+
+jobs:
+  # step 1: build backend app and save to a downloadable file
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Archive backend files
+        run: |
+          cd backend
+          tar -czf ../backend-files.tar.gz .
+
+      - name: Upload backend files artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-files
+          path: backend-files.tar.gz
+
+
+  # step 2: build frontend app and save to a downloadable file
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: build-backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Archive frontend build outputs
+        run: |
+          cd frontend
+          tar -czf ../frontend-build.tar.gz build
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-build
+          path: frontend-build.tar.gz
+
+
+  # step 3: connect to the frog server, deploy with deploy.sh script and check health
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-backend, build-frontend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download backend build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-files
+          path: ./backend
+
+      - name: Download frontend build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-build
+          path: ./frontend
+
+      - name: Copy deploy script to server
+        run: |
+          echo "Copying deploy script to server..."
+          sshpass -p "$FROG_PASSWORD" \
+            scp -P "$FROG_PORT" \
+            ./scripts/deploy.sh \
+            "$FROG_LOGIN@$FROG_URL:/home/frog/the-mars-mission/deploy.sh"
+
+      - name: Copy backend build to server
+        run: |
+          echo "Copying backend build to server..."
+          sshpass -p "$FROG_PASSWORD" \
+            scp -P "$FROG_PORT" \
+            ./backend/backend-files.tar.gz \
+            "$FROG_LOGIN@$FROG_URL:/home/frog/the-mars-mission/backend-files.tar.gz"
+
+      - name: Copy frontend build to server
+        run: |
+          echo "Copying frontend build to server..."
+          sshpass -p "$FROG_PASSWORD" \
+            scp -P "$FROG_PORT" \
+            ./frontend/frontend-build.tar.gz \
+            "$FROG_LOGIN@$FROG_URL:/home/frog/the-mars-mission/frontend-build.tar.gz"
+
+      - name: Deploy to server
+        run: |
+          echo "Deploying backend and frontend to server..."
+          sshpass -p "$FROG_PASSWORD" \
+            ssh "$FROG_LOGIN@$FROG_URL" -p "$FROG_PORT" << 'EOF'
+              bash /home/frog/the-mars-mission/deploy.sh \
+                "$BACKEND_PORT" \
+                "$FRONTEND_PORT" \
+                "$FROG_LOGIN" \
+                "$FROG_PASSWORD" \
+                "$FROG_URL" \
+                "$FROG_PORT"
+          EOF
+
+      - name: Check server health
+        run: |
+          echo "Checking server health..."
+          response=$(curl -s http://$FROG_URL:$BACKEND_PORT/api/health/check)
+          if [ "$response" = '{"message":"Hello Mars!"}' ]; then
+            echo "Health check passed!"
+          else
+            echo "Health check failed!"
+            exit 1
+          fi
