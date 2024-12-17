@@ -12,12 +12,21 @@ function App() {
 
   const [showModal, setShowModal] = useState(true);
   const [astronauts, setAstronauts] = useState<Astronaut[]>([]);
-  async function getAstronauts() {
-    const res = await fetch(`${apiUrl}/astronauts`);
-    const data = await res.json();
-    console.log(data);
-    setAstronauts(data.astronauts);
-  }
+
+  const getAstronauts = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/astronauts`);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      console.log(data);
+      setAstronauts(data.astronauts);
+    } catch (error) {
+      console.error("Error fetching astronauts:", error);
+      setLogMessage("Error fetching astronauts");
+    }
+  };
 
   const [selectedAstronaut, setSelectedAstronaut] = useState<Astronaut | null>(
     null
@@ -106,9 +115,9 @@ function App() {
     }, 3000);
   };
 
-  useEffect(function () {
+  useEffect(() => {
     getAstronauts();
-  }, [getAstronauts]);
+  }, []);
 
   return (
     <div className="App">
