@@ -82,7 +82,6 @@ jobs:
     environment: Production
     env:
       BACKEND_PORT: ${{ secrets.BACKEND_PORT }}
-      BACKEND_URL: ${{ secrets.BACKEND_URL }}
       FROG_LOGIN: ${{ secrets.FROG_LOGIN }}
       FROG_PASSWORD: ${{ secrets.FROG_PASSWORD }}
       FROG_PORT: ${{ secrets.FROG_PORT }}
