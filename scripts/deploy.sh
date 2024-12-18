@@ -12,11 +12,6 @@ FROG_PASSWORD=$4
 FROG_URL=$5
 FROG_PORT=$6
 
-# Check if the backend db folder exists, if not, create it
-if [ ! -d "/home/frog/the-mars-mission/backend/db" ]; then
-  echo "Creating backend db directory..."
-  mkdir -p /home/frog/the-mars-mission/backend/db
-fi
 
 # 1. Check if the app runs
 echo "Checking if the app is running..."
@@ -51,19 +46,21 @@ echo "Downloading the build..."
 curl -u $FROG_LOGIN:$FROG_PASSWORD -O $FROG_URL:$FROG_PORT/home/frog/the-mars-mission/backend-files.tar.gz
 curl -u $FROG_LOGIN:$FROG_PASSWORD -O $FROG_URL:$FROG_PORT/home/frog/the-mars-mission/frontend-build.tar.gz
 
-# 6. Restore the db file
+# 6 Check if the backend db folder exists, if not, create it
+if [ ! -d "/home/frog/the-mars-mission/backend/db" ]; then
+  echo "Creating backend db directory..."
+  mkdir -p /home/frog/the-mars-mission/backend/db
+fi
+
+# 7. Restore the db file
 echo "Restoring the database..."
 cp $BACKUP_DB_PATH $DB_PATH
 
-# 7. Start the backend app
+# 8. Start the backend app
 echo "Starting the backend app..."
 cd $BACKEND_DIR
 tar -xzf ../backend-files.tar.gz
 npm start &
-
-# 8. Install serve
-echo "Installing serve..."
-npm install -g serve
 
 # 9. Start the frontend app
 echo "Starting the frontend app..."
