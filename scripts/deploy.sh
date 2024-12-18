@@ -49,8 +49,12 @@ curl -u $FROG_LOGIN:$FROG_PASSWORD -O $FROG_URL:$FROG_PORT/home/frog/the-mars-mi
 # 6 Check if the backend db folder exists, if not, create it
 if [ ! -d "/home/frog/the-mars-mission/backend/db" ]; then
   echo "Creating backend db directory..."
-  mkdir -p /home/frog/the-mars-mission/backend/db
+  mkdir -p $BACKEND_DIR/db
 fi
+
+# Set write permissions for the db directory and its contents
+echo "Setting write permissions for the db directory and its contents..."
+chmod -R a+w $BACKEND_DIR/db
 
 # 7. Restore the db file
 echo "Restoring the database..."
