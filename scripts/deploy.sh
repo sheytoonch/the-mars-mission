@@ -12,6 +12,12 @@ FROG_PASSWORD=$4
 FROG_URL=$5
 FROG_PORT=$6
 
+# Check if the backend db folder exists, if not, create it
+if [ ! -d "/home/frog/the-mars-mission/backend/db" ]; then
+  echo "Creating backend db directory..."
+  mkdir -p /home/frog/the-mars-mission/backend/db
+fi
+
 # 1. Check if the app runs
 echo "Checking if the app is running..."
 if netstat -tulnp | grep -q ":$BACKEND_PORT"; then
