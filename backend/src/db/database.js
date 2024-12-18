@@ -4,7 +4,16 @@ const path = require('path');
 const fs = require('fs');
 
 const pathToAstronautsDB = path.join(__dirname, '../../db/astronauts.db');
+const dbDir = path.dirname(pathToAstronautsDB);
 console.log('Resolved DB Path:', pathToAstronautsDB);
+
+if (!fs.existsSync(dbDir)) {
+    fs.mkdirSync(dbDir, { recursive: true });
+    console.log(`Directory created at: ${dbDir}`);
+}
+
+fs.chmodSync(dbDir, 0o666);
+console.log(`Permissions set to read/write for directory: ${dbDir}`);
 
 // Path is related to where the Node.js process was started - root of the project
 // and not the file that is being executed. It can cause error if structure of the
